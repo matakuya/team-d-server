@@ -39,8 +39,10 @@ def login():
 
 @app.route('/store', methods=['POST'])
 def store_data():
+    # Checking Content-Type
     if request.headers['Content-Type'] == 'application/json':
         # POST paratemers
+        # {"user_id":"1","temp": "50","hot_cold": "0"}
         content = request.json
         manager = DBManager()
         manager.store_log(content)

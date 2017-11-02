@@ -19,3 +19,6 @@ charset = utf8
 
 ## 起動
 `$ python3 main.py`
+
+## リクエスト投げてみる
+`$ curl -H 'Content-Type:application/json' -d '{"user_id":"100","temp": "50","hot_cold": "0"}' localhost:5000/store`

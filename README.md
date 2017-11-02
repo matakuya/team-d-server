@@ -10,6 +10,7 @@ charset = utf8
 ```
 
 ## テーブルの作成
+mysqlに接続してから
 
 `create table log(id int auto_increment not null primary key, user_id int, temp int, hot_cold int, created_at datetime not null default current_timestamp);
 `

@@ -17,17 +17,28 @@ class DBManager:
 
     def get_log(self, id):
         try:
-            connection = MySQLdb.connect(**self.config)
-            print("connect database")
-            cursor = connection.cursor()
-            cursor.execute("select * from testtbl where event_type_id = (%s)", (id))
-            print("Execute Query.")
-        except MySQLdb.Error as e:
-            print("SQL ERROR %d: %s" % (e.args[0], e.args[1]))
+            try:
+                connection = MySQLdb.connect(**self.config)
+                print("connect database")
+                cursor = connection.cursor()
+                cursor.execute("select * from testtbl where event_type_id = (%s)", (id))
+                print("Execute Query.")
+            except MySQLdb.Error as e:
+                print(e)
+                return None
+            rv = cursor.fetchall()
+            if not(rv):
+                return None
+            payload = []
+            content = {}
+            for result in rv:
+                content = {'event_type_id': result[0], 'value': result[1], 'timestamp': result[2]}
+                payload.append(content)
+                content = {}
+            return payload
         finally:
-            if connection: connection.close()
+            connection.close()
             print("Connection Closed.")
-        return cursor.fetchall()
 
 @app.route('/login')
 def login():
@@ -37,7 +48,12 @@ def login():
 def get_data(id):
     manager = DBManager()
     logs = manager.get_log(id)
-    return jsonify(logs)
+    if not(logs):
+        return jsonify({'status':'Error'})
+    return jsonify({
+        'status':'OK',
+        'logs':logs
+    })
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

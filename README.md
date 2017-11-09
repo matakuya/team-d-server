@@ -16,6 +16,7 @@ mysqlに接続してから
 `
 
 ## 必要なパッケージのインストール
+`$ sudo apt-get install libmysqlclient-dev`
 `$ pip3 install -r requirements.txt`
 
 ## 起動

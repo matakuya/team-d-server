@@ -15,40 +15,29 @@ class DBManager:
     def get_config(self):
         return self.config
 
-    def store_log(self, data):
+    def get_log(self, id):
         try:
             connection = MySQLdb.connect(**self.config)
             print("connect database")
             cursor = connection.cursor()
-            cursor.execute("insert into log (user_id, temp, hot_cold)values (%s, %s, %s)", (data['user_id'], data['temp'], data['hot_cold']))
-            connection.commit()
+            cursor.execute("select * from testtbl where event_type_id = (%s)", (id))
             print("Execute Query.")
         except MySQLdb.Error as e:
             print("SQL ERROR %d: %s" % (e.args[0], e.args[1]))
         finally:
             if connection: connection.close()
             print("Connection Closed.")
-
-@app.route('/')
-def index():
-    return "Hello World!"
+        return cursor.fetchall()
 
 @app.route('/login')
 def login():
     return ""
 
-@app.route('/store', methods=['POST'])
-def store_data():
-    # Checking Content-Type
-    if request.headers['Content-Type'] == 'application/json':
-        # POST paratemers
-        # {"user_id":"1","temp": "50","hot_cold": "0"}
-        content = request.json
-        manager = DBManager()
-        manager.store_log(content)
-        return "success."
-    else:
-        return "Invalid Request."
+@app.route('/log/<id>', methods=['GET'])
+def get_data(id):
+    manager = DBManager()
+    logs = manager.get_log(id)
+    return jsonify(logs)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
